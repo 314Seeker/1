@@ -9,7 +9,7 @@
     margin: 20px;
   }
   #display {
-    width: 300px;
+    width: 360px;
     height: 40px;
     font-size: 20px;
     margin-bottom: 10px;
@@ -19,7 +19,7 @@
   .buttons {
     display: flex;
     flex-wrap: wrap;
-    max-width: 280px;
+    max-width: 360px;
   }
   button {
     width: 70px;
@@ -41,23 +41,22 @@
   <button data-digit="7">7</button>
   <button data-digit="8">8</button>
   <button data-digit="9">9</button>
+<button data-operation="+">+</button>
 
   <button data-digit="4">4</button>
   <button data-digit="5">5</button>
   <button data-digit="6">6</button>
+ <button data-operation="-">-</button>
 
   <button data-digit="1">1</button>
   <button data-digit="2">2</button>
   <button data-digit="3">3</button>
-
-
-  <button data-operation="+">+</button>
-  <button data-operation="-">-</button>
-  <button data-operation="*">*</button>
+<button data-operation="*">*</button>
   
   <button data-digit="0">0</button>
   <button id="clear">C</button>
   <button id="equals" style="background-color:#4CAF50; color:white;">=</button>
+    <button data-operation="/">/</button>
 
 </div>
 
@@ -145,6 +144,9 @@ equalsButton.addEventListener('click', () => {
         case '*':
             result = firstNumber * secondNumber;
             break;
+            case '/':
+            result = firstNumber / secondNumber;
+            break;
         // добавьте деление и другие операции по необходимости
     }
 
@@ -173,7 +175,7 @@ function handleKeyPress(event) {
     
     if (key >= '0' && key <= '9') {
         inputNumber(key);
-    } else if (key === '+' || key === '-' || key === '*') {
+    } else if (key === '+' || key === '-' || key === '*' || key === '/') {
         setOperation(key);
     } else if (key === 'Enter') {
         calculateResult();
@@ -202,6 +204,15 @@ function calculateResult() {
     if (currentInput !== "" && firstNumber !== null && currentOperation !== null) {
         secondNumber = parseFloat(currentInput);
         let result;
+        if (currentOperation === '/' && secondNumber === 0) {
+            alert("Ошибка: деление на ноль невозможно");
+            // Можно сбросить состояние или оставить как есть
+            display.value = "Ошибка";
+            currentInput = "";
+            firstNumber = null;
+            currentOperation = null;
+            return;
+        }
         switch (currentOperation) {
             case '+':
                 result = firstNumber + secondNumber;
@@ -211,6 +222,9 @@ function calculateResult() {
                 break;
             case '*':
                 result = firstNumber * secondNumber;
+                break;
+            case '/':
+                result = firstNumber / secondNumber;
                 break;
             default:
                 return;
