@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Калькулятор</title>
+<style>
+  body {
+    font-family: Arial;
+    margin: 20px;
+  }
+  #display {
+    width: 300px;
+    height: 40px;
+    font-size: 20px;
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+  }
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 280px;
+  }
+  button {
+    width: 70px;
+    height: 40px;
+    margin: 5px;
+    font-size: 16px;
+  }
+</style>
+</head>
+<body>
+
+<h2>Калькулятор</h2>
+
+<!-- Поле вывода -->
+<input type="text" id="display" readonly />
+
+<!-- Кнопки цифр -->
+<div class="buttons">
+  <button data-digit="7">7</button>
+  <button data-digit="8">8</button>
+  <button data-digit="9">9</button>
+
+  <button data-digit="4">4</button>
+  <button data-digit="5">5</button>
+  <button data-digit="6">6</button>
+
+  <button data-digit="1">1</button>
+  <button data-digit="2">2</button>
+  <button data-digit="3">3</button>
+
+
+  <button data-operation="+">+</button>
+  <button data-operation="-">-</button>
+  <button data-operation="*">*</button>
+  
+  <button data-digit="0">0</button>
+  <button id="clear">C</button>
+  <button id="equals" style="background-color:#4CAF50; color:white;">=</button>
+
+</div>
+
+<!-- Операции -->
+
+
+<script>
+// Переменные для хранения данных
+let firstNumber = null;
+let secondNumber = null;
+let currentOperation = null;
+
+// Объект для хранения текущего ввода
+let currentInput = "";
+
+// Получение элементов
+const display = document.getElementById('display');
+const digitButtons = document.querySelectorAll('button[data-digit]');
+const operationButtons = document.querySelectorAll('button[data-operation]');
+const equalsButton = document.getElementById('equals');
+const clearButton = document.getElementById('clear');
+// я нихера не понял что они точно делают, нужно пояснение!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+// Функция для обновления дисплея
+function updateDisplay() {
+   if (firstNumber !== null && currentOperation !== null && currentInput === "") {
+        // Когда пользователь выбрал операцию, но еще не ввел второе число
+        display.value = firstNumber + " " + currentOperation;
+    } else if (firstNumber !== null && currentOperation !== null && currentInput !== "") {
+        // Когда пользователь вводит второе число
+        display.value = firstNumber + " " + currentOperation + " " + currentInput;
+    } else {
+        // Просто показываем текущий ввод
+        display.value = currentInput;
+    }
+}
+
+// Обработка нажатия цифр
+digitButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        // Добавляем цифру к текущему вводу
+        currentInput += button.getAttribute('data-digit');
+        updateDisplay();
+    });
+});
+
+// Обработка выбора операции
+operationButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        if (currentInput === "") {
+            alert("не в туда тыкаешь!");
+            return;
+        }
+        if (firstNumber !== null && currentOperation !== null) {
+            // Если уже есть первая часть и операция, можно выполнить промежуточное вычисление или просто заменить операцию
+            // Для простоты заменим операцию
+            currentOperation = button.getAttribute('data-operation');
+        } else {
+            firstNumber = parseFloat(currentInput);
+            currentOperation = button.getAttribute('data-operation');
+            currentInput = "";
+        }
+        updateDisplay();
+    });
+});
+
+// Обработка кнопки "="
+equalsButton.addEventListener('click', () => {
+    if (currentInput === "" || firstNumber === null || currentOperation === null) {
+        alert("забыл чего-то?");
+        return;
+    }
+    
+    secondNumber = parseFloat(currentInput);
+    
+    let result;
+
+    switch (currentOperation) {
+        case '+':
+            result = firstNumber + secondNumber;
+            break;
+        case '-':
+            result = firstNumber - secondNumber;
+            break;
+        case '*':
+            result = firstNumber * secondNumber;
+            break;
+        // добавьте деление и другие операции по необходимости
+    }
+
+    // Выводим результат на дисплей вместе с выражением
+    display.value = result;
+
+    // Обновляем переменные для следующего вычисления
+    currentInput = result.toString();
+    firstNumber = null; // или оставить для цепочки вычислений
+    secondNumber = null;
+    currentOperation = null;
+});
+// Обработка кнопки "C" для сброса данных
+clearButton.addEventListener('click', () => {
+    currentInput = "";
+    firstNumber = null;
+    secondNumber = null;
+    currentOperation = null;
+    updateDisplay();
+});
+
+document.addEventListener('keydown', handleKeyPress);
+
+function handleKeyPress(event) {
+    const key = event.key; 
+    
+    if (key >= '0' && key <= '9') {
+        inputNumber(key);
+    } else if (key === '+' || key === '-' || key === '*') {
+        setOperation(key);
+    } else if (key === 'Enter') {
+        calculateResult();
+    } else if (key === 'Backspace') {
+        deleteLast();
+    } else if (key === ',') {
+        addDecimalPoint();
+    }
+}
+
+function inputNumber(digit) {
+    currentInput += digit;
+    updateDisplay();
+}
+
+function setOperation(op) {
+    if (currentInput !== "") {
+        firstNumber = parseFloat(currentInput);
+        currentOperation = op;
+        currentInput = "";
+        updateDisplay();
+    }
+}
+
+function calculateResult() {
+    if (currentInput !== "" && firstNumber !== null && currentOperation !== null) {
+        secondNumber = parseFloat(currentInput);
+        let result;
+        switch (currentOperation) {
+            case '+':
+                result = firstNumber + secondNumber;
+                break;
+            case '-':
+                result = firstNumber - secondNumber;
+                break;
+            case '*':
+                result = firstNumber * secondNumber;
+                break;
+            default:
+                return;
+        }
+        display.value = result;
+        currentInput = result.toString();
+        firstNumber = null;
+        currentOperation = null;
+    }
+}
+
+function deleteLast() {
+    currentInput = currentInput.slice(0, -1);
+    updateDisplay();
+}
+
+function addDecimalPoint() {
+    if (!currentInput.includes('.')) {
+        currentInput += '.';
+        updateDisplay();
+    }
+}
+
+</script>
+
+</body>
+</html>
